@@ -2,27 +2,52 @@ const posts = require('../models/postModel');
 const AUTO  = process.env.AUTO_APPROVE === 'true';
 
 exports.getPosts = async (req, res) => {
-  const { sort, order, search, category, from, to, limit, offset } = req.query;
-  const rows  = await posts.list({ sort, order, search, category, from, to,
-                                   limit: +limit || 20, offset: +offset || 0 });
+  const { sort, order, search, category, from, to,
+          limit, offset, flat } = req.query;
+
+  const rows = await posts.list({
+    sort, order, search, category, from, to,
+    limit: +limit || 20,
+    offset: +offset || 0
+  });
+
+  // any truthy ?flat=1 forces a flat array response
+  if (flat || (!limit && !offset)) return res.json(rows);
+
   const total = await posts.count({ search, category, from, to });
   res.json({ rows, total });
 };
 
+// controllers/postController.js
 exports.createPost = async (req, res) => {
-  const { title, content, scheduled_at, categoryId } = req.body;
-  const sched = scheduled_at ? new Date(scheduled_at) : null;
+  try {
+    const { title, content, scheduled_at, categoryId } = req.body;
 
-  const p = await posts.create({
-    title,
-    content,
-    categoryId: categoryId || null,
-    scheduled_at: sched,
-    approved: AUTO,
-    createdById: req.user.id,
-    updatedById: req.user.id
-  });
-  res.json({ id: p.id });
+    // 1) konvertuojam kategoriją: ''  →  null;  '3' → 3
+    const catId = categoryId ? Number(categoryId) : null;
+    if (categoryId && Number.isNaN(catId)) {
+      return res.status(400).json({ message: 'Neteisinga kategorija' });
+    }
+
+    // 2) data & laikas
+    const sched = scheduled_at ? new Date(scheduled_at) : null;
+
+    // 3) kuriame
+    const post = await posts.create({
+      title,
+      content,
+      categoryId: catId,      // 👈 jau Int arba null
+      scheduled_at: sched,
+      approved     : AUTO,
+      createdById  : req.user.id,
+      updatedById  : req.user.id,
+    });
+
+    res.json({ id: post.id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Serverio klaida' });
+  }
 };
 
 exports.updatePost = async (req, res) => {
