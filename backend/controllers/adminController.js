@@ -1,5 +1,5 @@
-const users = require('../models/userRepo');
-const posts = require('../models/postRepo');
+const users = require('../models/userModel');
+const posts = require('../models/postModel');
 
 exports.getUsers        = (_,res) => users.list().then(r=>res.json(r));
 exports.deleteUser      = (req,res) => users.delete(parseInt(req.params.id)).then(()=>res.json({ message:'User deleted' }));

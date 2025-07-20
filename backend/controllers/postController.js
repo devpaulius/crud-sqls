@@ -1,4 +1,4 @@
-const posts = require('../models/postRepo');
+const posts = require('../models/postModel');
 const AUTO  = process.env.AUTO_APPROVE === 'true';
 
 exports.getPosts = async (req, res) => {

@@ -1,6 +1,6 @@
 const bcrypt  = require('bcrypt');
 const jwt     = require('jsonwebtoken');
-const users   = require('../models/userRepo');
+const users   = require('../models/userModel');
 const SECRET  = process.env.JWT_SECRET || 'supersecret';
 
 exports.register = async (req,res) => {

@@ -1,4 +1,4 @@
-const cats = require('../models/categoryRepo');
+const cats = require('../models/categoryModel');
 
 exports.getAll = (_,res) => cats.all().then(r=>res.json(r));
 

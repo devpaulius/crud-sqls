@@ -1,4 +1,4 @@
-const users = require('../models/userRepo');
+const users = require('../models/userModel');
 
 exports.getProfile = async (req,res) => {
   const u = await users.find(parseInt(req.params.id));

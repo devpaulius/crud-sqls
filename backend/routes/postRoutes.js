@@ -9,7 +9,7 @@ router.post('/', auth, postCtl.createPost);
 
 // CRUD on single post
 router.get('/:id',  async (req, res) => {
-  const post = await require('../models/postRepo').find(parseInt(req.params.id));
+  const post = await require('../models/postModel').find(parseInt(req.params.id));
   if (!post) return res.sendStatus(404);
   res.json(post);
 });
