@@ -1,0 +1,189 @@
+/* globals.css */
+
+/* Base styles (applies to both themes) */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0.5em 0;
+  font-weight: 600;
+}
+
+input, select, textarea {
+  padding: 0.5em 0.75em;
+  margin: 0.4em 0;
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 400px;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  transition: background-color 0.2s, color 0.2s;
+  display: inline-block;
+  width: auto;
+}
+
+nav.nav-bar {
+  padding: 0.75em 1em;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+nav.nav-bar a, nav.nav-bar button {
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+nav.nav-bar a:hover, nav.nav-bar button:hover {
+  text-decoration: underline;
+}
+
+footer {
+  text-align: center;
+  padding: 1em 0;
+  font-size: 0.9rem;
+  margin-top: 2em;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 0.95rem;
+}
+
+table th, table td {
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+
+ul, ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+li {
+  margin-bottom: 0.3em;
+  font-size: 0.95rem;
+}
+
+form {
+  padding: 1em;
+  border-radius: 6px;
+  max-width: 500px;
+  margin: 1em auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+div {
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1em;
+}
+
+/* Light theme */
+body.light {
+  background-color: #fafafa;
+  color: #333;
+}
+
+body.light nav.nav-bar {
+  background-color: #222;
+}
+
+body.light nav.nav-bar a, body.light nav.nav-bar button {
+  color: #fff;
+}
+
+body.light footer {
+  background-color: #222;
+  color: #fff;
+}
+
+body.light button {
+  background-color: #007bff;
+  color: #fff;
+}
+
+body.light button:hover {
+  background-color: #0056b3;
+}
+
+body.light input, body.light select, body.light textarea {
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+body.light table th, body.light table td {
+  border: 1px solid #ddd;
+}
+
+body.light table tr:nth-child(even) {
+  background-color: #f4f4f4;
+}
+
+/* Dark theme */
+body.dark {
+  background-color: #222;
+  color: #f0f0f0;
+}
+
+body.dark nav.nav-bar {
+  background-color: #333;
+}
+
+body.dark nav.nav-bar a, body.dark nav.nav-bar button {
+  color: #fff;
+}
+
+body.dark footer {
+  background-color: #333;
+  color: #fff;
+}
+
+body.dark button {
+  background-color: #444;
+  color: #f0f0f0;
+}
+
+body.dark button:hover {
+  background-color: #555;
+}
+
+body.dark input, body.dark select, body.dark textarea {
+  background-color: #333;
+  color: #f0f0f0;
+  border: 1px solid #555;
+}
+
+body.dark table th, body.dark table td {
+  border: 1px solid #444;
+}
+
+body.dark table tr:nth-child(even) {
+  background-color: #2a2a2a;
+}
