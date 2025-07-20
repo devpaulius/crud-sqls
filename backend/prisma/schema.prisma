@@ -1,26 +1,64 @@
+// --- SQLite (file‑based, no server) -----------------------------------------
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")  // e.g.  "file:./dev.db"
+}
+
+// --- MySQL ------------------------------------------------------------------
+// datasource db {
+//   provider = "mysql"
+//   url      = env("DATABASE_URL")     // e.g.  "mysql://user:pass@localhost:3306/crud"
+// }
+
+// --- PostgreSQL -------------------------------------------------------------
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")   // e.g.  "postgresql://user:pass@localhost:5432/crud"
+// }
+
+// --- MariaDB ----------------------------------------------------------------
+// datasource db {
+//   provider = "mysql"
+//   url      = env("DATABASE_URL")   // e.g.  "mysql://user:pass@localhost:3306/crud"
+// }
+
+// --- SQL Server -------------------------------------------------------------
+// datasource db {
+//   provider = "sqlserver"
+//   url      = env("DATABASE_URL")   // e.g.  "sqlserver://localhost:1433;database=crud;user=sa;password=Passw0rd"
+// }
+
+// --- MongoDB (preview) ------------------------------------------------------
+// datasource db {
+//   provider = "mongodb"
+//   url      = env("DATABASE_URL")   // e.g.  "mongodb://localhost:27017/crud"
+// }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Prisma generator – always the same
+// ─────────────────────────────────────────────────────────────────────────────
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
+// ─────────────────────────────────────────────────────────────────────────────
+//  Your data‑model – UNCHANGED across databases
+// ─────────────────────────────────────────────────────────────────────────────
 
 model User {
-  id               Int     @id @default(autoincrement())
-  username         String  @unique
-  email            String  @unique
+  id               Int      @id @default(autoincrement())
+  username         String   @unique
+  email            String   @unique
   password         String
   first_name       String?
   last_name        String?
   middle_name      String?
-  acknowledged     Boolean @default(false)
+  acknowledged     Boolean  @default(false)
   ip_address       String?
-  theme_preference String  @default("light")
-  is_admin         Boolean @default(false)
-  public_profile   Boolean @default(true)
-  blocked          Boolean @default(false)
+  theme_preference String   @default("light")
+  is_admin         Boolean  @default(false)
+  public_profile   Boolean  @default(true)
+  blocked          Boolean  @default(false)
 
   postsCreated Post[] @relation("CreatedPosts")
   postsUpdated Post[] @relation("UpdatedPosts")
@@ -28,8 +66,8 @@ model User {
 }
 
 model Category {
-  id   Int    @id @default(autoincrement())
-  name String @unique
+  id    Int    @id @default(autoincrement())
+  name  String @unique
   posts Post[]
 }
 
@@ -43,8 +81,8 @@ model Post {
   likes        Int       @default(0)
   approved     Boolean   @default(true)
 
-  categoryId Int?
-  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId  Int?
+  category    Category? @relation(fields: [categoryId], references: [id])
 
   createdById Int
   createdBy   User @relation("CreatedPosts", fields: [createdById], references: [id])
@@ -52,7 +90,7 @@ model Post {
   updatedById Int
   updatedBy   User @relation("UpdatedPosts", fields: [updatedById], references: [id])
 
-  likesBy PostLike[]
+  likesBy     PostLike[]
 }
 
 model PostLike {

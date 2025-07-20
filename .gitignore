@@ -1,24 +1,38 @@
-# Logs
-logs
-*.log
+###############################################################################
+#  Node & build artefacts
+###############################################################################
+node_modules/
+dist/
+dist-ssr/
+build/
+coverage/
+*.tsbuildinfo
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+###############################################################################
+#  Environment secrets
+###############################################################################
+.env
+.env.*          # .env.local, .env.staging, …
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+###############################################################################
+#  Prisma / database
+###############################################################################
+/prisma/dev.db          # old SQLite file
+/prisma/*.db-journal
+*.sqlite                # other local snapshots
+
+# Usually you DO want migrations tracked in Git.
+# Delete the next line if you prefer to version them:
+#/prisma/migrations/
+
+###############################################################################
+#  Editor junk
+###############################################################################
+.vscode/
+.idea/
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
+Thumbs.db
 *.sw?

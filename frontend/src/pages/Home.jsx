@@ -83,7 +83,7 @@ export default function Home() {
         <div key={p.id} style={{ border: '1px solid #ddd', padding: 10, margin: 10 }}>
           <h3>{p.title}</h3>
           <p>{p.content}</p>
-          <p>Category: {p.categoryName || 'None'}</p>
+          <p>Category: {p.category?.name || 'None'}</p>
           <p>Likes: {p.likes}</p>
           {user && (
             <div>

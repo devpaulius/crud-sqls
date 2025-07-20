@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import API from '../api/api';
 
 export default function Stats() {
-  const [stats, setStats] = useState({ post_count: 0, user_count: 0 });
+  const [stats, setStats] = useState({ postCount: 0, userCount: 0, likeCount: 0 });
+
 
   useEffect(() => {
-    API.get('/stats').then(res => setStats(res.data));
+    API.get('/stats').then(r => setStats(r.data));
   }, []);
 
   return (
@@ -13,14 +14,9 @@ export default function Stats() {
       <h2>Statistics</h2>
       <table>
         <tbody>
-          <tr>
-            <td>Total Posts:</td>
-            <td>{stats.post_count}</td>
-          </tr>
-          <tr>
-            <td>Total Users:</td>
-            <td>{stats.user_count}</td>
-          </tr>
+          <tr><td>Total Posts:</td><td>{stats.postCount}</td></tr>
+          <tr><td>Total Users:</td><td>{stats.userCount}</td></tr>
+          <tr><td>Total Likes:</td><td>{stats.likeCount}</td></tr>
         </tbody>
       </table>
     </div>

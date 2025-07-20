@@ -24,8 +24,9 @@ app.use('/admin',      adminRoutes);
 app.use('/users',      userRoutes);
 app.use('/categories', catRoutes);
 
+app.get('/stats',               statsCtrl.getSummary);
 app.get('/stats/likes-average', statsCtrl.getLikesAverage);
-app.get('/posts/likes/avg',      statsCtrl.getLikesAverage);
+app.get('/posts/likes/avg',     statsCtrl.getLikesAverage);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ API on :${PORT}`));
