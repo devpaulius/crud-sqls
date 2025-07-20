@@ -15,9 +15,9 @@ npm run dev                     # http://localhost:5000
 * Runs on **any SQL** – default is SQLite, swap `DATABASE_URL` for MySQL, Postgres, etc.
 
 
-npx prisma generate
 <!-- npx prisma migrate dev --name sqlite ==> bad -->
 <!-- npx prisma migrate dev --create-only --name init-sqlite -->
 
+npx prisma generate
 npx prisma migrate dev --name init-sqlite
 npx prisma migrate deploy
