@@ -1,21 +1,22 @@
 const express = require('express');
-const router = express.Router();
-const postController = require('../controllers/postController');
-const authMiddleware = require('../middleware/authMiddleware');
+const router  = express.Router();
+const postCtl = require('../controllers/postController');
+const auth    = require('../middleware/authMiddleware');
 
-router.get('/', postController.getPosts);
-router.post('/', authMiddleware, postController.createPost);
-router.put('/:id', authMiddleware, postController.updatePost);
-router.delete('/:id', authMiddleware, postController.deletePost);
-router.post('/:id/like', authMiddleware, postController.likePost);
+// list & create
+router.get('/',  postCtl.getPosts);
+router.post('/', auth, postCtl.createPost);
 
-// GET /posts/:id - single post fetch
-router.get('/:id', (req, res) => {
-  const Post = require('../models/postModel');
-  Post.findById(req.params.id, (err, results) => {
-    if (err || !results) return res.sendStatus(404);
-    res.json(results);
-  });
+// CRUD on single post
+router.get('/:id',  async (req, res) => {
+  const post = await require('../models/postRepo').find(parseInt(req.params.id));
+  if (!post) return res.sendStatus(404);
+  res.json(post);
 });
+router.put('/:id',    auth, postCtl.updatePost);
+router.delete('/:id', auth, postCtl.deletePost);
+
+// like
+router.post('/:id/like', auth, postCtl.likePost);
 
 module.exports = router;

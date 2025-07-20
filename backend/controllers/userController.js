@@ -1,57 +1,41 @@
-const User = require('../models/userModel');
+const users = require('../models/userRepo');
 
-exports.getProfile = (req, res) => {
-  User.findById(req.params.id, (err, user) => {
-    if (err || !user) return res.sendStatus(404);
+exports.getProfile = async (req,res) => {
+  const u = await users.find(parseInt(req.params.id));
+  if (!u) return res.sendStatus(404);
 
-    const requester = req.user;
-    const isOwner = requester && requester.id === user.id;
-    const isAdmin = requester && requester.is_admin;
+  const me   = req.user;
+  const own  = me && me.id === u.id;
+  const adm  = me && me.is_admin;
 
-    if (!user.public_profile && !isOwner && !isAdmin) return res.sendStatus(404);
-
-    if (!user.public_profile && !isOwner && !isAdmin) delete user.email;
-
-    res.json(user);
-  });
+  if (!u.public_profile && !own && !adm) return res.sendStatus(404);
+  if (!u.public_profile && !own && !adm) delete u.email;
+  res.json(u);
 };
 
-exports.updateProfile = (req, res) => {
-  const id = parseInt(req.params.id);
-  if (id !== req.user.id) return res.sendStatus(403);
-
-  const { first_name, last_name, middle_name, email } = req.body;
-  User.updateProfile(id, { first_name, last_name, middle_name, email }, err => {
-    if (err) return res.status(500).json({ message: 'Server error' });
-    res.json({ message: 'Profile updated' });
-  });
+exports.updateProfile = async (req,res) => {
+  if (req.user.id !== parseInt(req.params.id)) return res.sendStatus(403);
+  await users.updateProfile(req.user.id, req.body);
+  res.json({ message:'Profile updated' });
 };
 
-exports.deleteProfile = (req, res) => {
-  const id = parseInt(req.params.id);
-  if (id !== req.user.id) return res.sendStatus(403);
-
-  User.delete(id, err => {
-    if (err) return res.status(500).json({ message: 'Server error' });
-    res.json({ message: 'Account deleted' });
-  });
+exports.deleteProfile = async (req,res) => {
+  if (req.user.id !== parseInt(req.params.id)) return res.sendStatus(403);
+  await users.delete(req.user.id);
+  res.json({ message:'Account deleted' });
 };
 
-exports.getSettings = (req, res) => {
-  const userId = req.params.id;
-  User.getSettings(userId, (err, settings) => {
-    if (err || !settings) return res.status(404).json({ message: 'Not found' });
-    res.json(settings[0]);
-  });
+exports.getSettings = async (req,res) => {
+  const s = await users.settings(parseInt(req.params.id));
+  if (!s) return res.status(404).json({ message:'Not found' });
+  res.json(s);
 };
 
-exports.updateSettings = (req, res) => {
-  const userId = req.params.id;
+exports.updateSettings = async (req,res) => {
+  if (req.user.id !== parseInt(req.params.id)) return res.sendStatus(403);
   const { theme_preference, acknowledged, public_profile } = req.body;
-  const ip = req.ip;
-
-  User.updateSettings(userId, theme_preference, acknowledged, ip, !!public_profile, err => {
-    if (err) return res.status(500).json({ message: 'Server error' });
-    res.json({ message: 'Settings updated' });
+  await users.updateSettings(req.user.id,{
+    theme_preference, acknowledged, ip_address:req.ip, public_profile:!!public_profile
   });
+  res.json({ message:'Settings updated' });
 };

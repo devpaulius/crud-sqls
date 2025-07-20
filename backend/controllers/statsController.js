@@ -1,13 +1,6 @@
-const db = require('../config/db');
+const prisma = require('../config/prismaClient');
 
-exports.getLikesAverage = (req, res) => {
-  const sql = `
-    SELECT 
-      IFNULL(AVG(likes), 0) AS avg_likes
-    FROM posts
-  `;
-  db.query(sql, (err, results) => {
-    if (err) return res.status(500).json({ message: 'Server error' });
-    res.json({ avg_likes: results[0].avg_likes });
-  });
+exports.getLikesAverage = async (_,res) => {
+  const { _avg } = await prisma.post.aggregate({ _avg:{ likes:true } });
+  res.json({ avg_likes: _avg.likes || 0 });
 };

@@ -1,23 +1,20 @@
 const bcrypt = require('bcrypt');
-const db = require('../config/db');
+const prisma = require('../config/prismaClient');
 
-function ensureAdmin() {
-  db.query('SELECT * FROM users WHERE username = "admin"', (err, results) => {
-    if (err) throw err;
-    if (results.length === 0) {
-      bcrypt.hash('admin', 10, (err, hash) => {
-        if (err) throw err;
-        db.query(
-          'INSERT INTO users (username, email, password, is_admin) VALUES (?, ?, ?, ?)',
-          ['admin', 'admin@example.com', hash, true],
-          (err) => {
-            if (err) throw err;
-            console.log('Default admin created: username=admin password=admin');
-          }
-        );
-      });
+async function ensureAdmin() {
+  const admin = await prisma.user.findUnique({ where: { username: 'admin' } });
+  if (admin) return;
+
+  const hash = await bcrypt.hash('admin', 10);
+  await prisma.user.create({
+    data: {
+      username: 'admin',
+      email: 'admin@example.com',
+      password: hash,
+      is_admin: true
     }
   });
+  console.log('Default admin created: username=admin password=admin');
 }
 
 module.exports = ensureAdmin;

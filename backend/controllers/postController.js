@@ -1,95 +1,59 @@
-const Post = require('../models/postModel');
-const AUTO_APPROVE = process.env.AUTO_APPROVE === 'true';
+const posts = require('../models/postRepo');
+const AUTO  = process.env.AUTO_APPROVE === 'true';
 
-exports.getPosts = (req, res) => {
+exports.getPosts = async (req, res) => {
   const { sort, order, search, category, from, to, limit, offset } = req.query;
-  Post.getApprovedPosts({ sort, order, search, category, from, to, limit, offset }, (err, result) => {
-    if (err) return res.status(500).json({ message: 'Server error' });
-    res.json(result);
-  });
+  const rows  = await posts.list({ sort, order, search, category, from, to,
+                                   limit: +limit || 20, offset: +offset || 0 });
+  const total = await posts.count({ search, category, from, to });
+  res.json({ rows, total });
 };
 
-exports.createPost = (req, res) => {
+exports.createPost = async (req, res) => {
   const { title, content, scheduled_at, categoryId } = req.body;
-  const userId   = req.user.id;
-  const approved = AUTO_APPROVE ? 1 : 0;
+  const sched = scheduled_at ? new Date(scheduled_at) : null;
 
-  Post.create(
-    { title, content, createdBy: userId, categoryId, scheduledAt: scheduled_at, approved },
-    (err, out) => {
-      if (err) return res.status(500).json({ message: 'Server error' });
-      res.json({ id: out.insertId });
-    }
-  );
-};
-
-exports.updatePost = (req, res) => {
-  const { title, content, scheduled_at, categoryId } = req.body;
-  const userId = req.user.id;
-
-  Post.findById(req.params.id, (err, post) => {
-    if (err || !post) return res.sendStatus(404);
-    if (post.created_by !== userId && !req.user.is_admin) return res.sendStatus(403);
-
-    Post.update(
-      req.params.id,
-      { title, content, updatedBy: userId, categoryId, scheduledAt: scheduled_at },
-      err2 => {
-        if (err2) return res.status(500).json({ message: 'Server error' });
-        res.json({ message: 'Post updated' });
-      }
-    );
+  const p = await posts.create({
+    title,
+    content,
+    categoryId: categoryId || null,
+    scheduled_at: sched,
+    approved: AUTO,
+    createdById: req.user.id,
+    updatedById: req.user.id
   });
+  res.json({ id: p.id });
 };
 
-exports.deletePost = (req, res) => {
-  const userId = req.user.id;
-  Post.findById(req.params.id, (err, post) => {
-    if (err || !post) return res.sendStatus(404);
-    if (post.created_by !== userId && !req.user.is_admin) return res.sendStatus(403);
+exports.updatePost = async (req, res) => {
+  const id = parseInt(req.params.id);
+  const p  = await posts.find(id);
+  if (!p) return res.sendStatus(404);
+  if (p.createdById !== req.user.id && !req.user.is_admin) return res.sendStatus(403);
 
-    Post.delete(req.params.id, err2 => {
-      if (err2) return res.status(500).json({ message: 'Server error' });
-      res.json({ message: 'Post deleted' });
-    });
-  });
+  await posts.update(id, { ...req.body, updatedById: req.user.id });
+  res.json({ message: 'Post updated' });
 };
 
-exports.likePost = (req, res) => {
-  const userId = req.user.id;
-  const postId = req.params.id;
+exports.deletePost = async (req, res) => {
+  const id = parseInt(req.params.id);
+  const p  = await posts.find(id);
+  if (!p) return res.sendStatus(404);
+  if (p.createdById !== req.user.id && !req.user.is_admin) return res.sendStatus(403);
 
-  Post.alreadyLiked(userId, postId, (err, rows) => {
-    if (err) return res.status(500).json({ message: 'Server error' });
-    if (rows.length) return res.status(400).json({ message: 'Already liked' });
-
-    Post.recordLike(userId, postId, err2 => {
-      if (err2) return res.status(500).json({ message: 'Server error' });
-      Post.incrementLikes(postId, err3 => {
-        if (err3) return res.status(500).json({ message: 'Server error' });
-        res.json({ message: 'Post liked' });
-      });
-    });
-  });
+  await posts.remove(id);
+  res.json({ message: 'Post deleted' });
 };
 
-exports.getPendingPosts = (req, res) => {
-  Post.getPending((err, posts) => {
-    if (err) return res.status(500).json({ message: 'Server error' });
-    res.json(posts);
-  });
+exports.likePost = async (req, res) => {
+  try {
+    await posts.like(req.user.id, parseInt(req.params.id));
+    res.json({ message: 'Post liked' });
+  } catch {
+    res.status(400).json({ message: 'Already liked' });
+  }
 };
 
-exports.approvePost = (req, res) => {
-  Post.approve(req.params.id, err => {
-    if (err) return res.status(500).json({ message: 'Server error' });
-    res.json({ message: 'Post approved' });
-  });
-};
-
-exports.rejectPost = (req, res) => {
-  Post.reject(req.params.id, err => {
-    if (err) return res.status(500).json({ message: 'Server error' });
-    res.json({ message: 'Post rejected' });
-  });
-};
+exports.getPendingPosts = (_, res) => posts.pending().then(r => res.json(r));
+exports.approvePost     = (req, res) => posts.approve(parseInt(req.params.id)).then(() => res.json({ message: 'Approved' }));
+exports.rejectPost      = (req, res) => posts.reject (parseInt(req.params.id)).then(() => res.json({ message: 'Rejected' }));

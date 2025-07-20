@@ -1,37 +1,13 @@
-const Category = require('../models/categoryModel');
+const cats = require('../models/categoryRepo');
 
-exports.getAll = (req, res) => {
-  Category.getAll((err, results) => {
-    if (err) return res.status(500).json({ message: 'Server error' });
-    res.json(results);
-  });
-};
+exports.getAll = (_,res) => cats.all().then(r=>res.json(r));
 
-exports.create = (req, res) => {
-  const { name } = req.body;
-  if (!name || name.trim() === '') {
-    return res.status(400).json({ message: 'Category name is required' });
-  }
-  Category.create(name.trim(), (err, result) => {
-    if (err) return res.status(500).json({ message: 'Server error' });
-    res.json({ id: result.insertId, name: name.trim() });
-  });
-};
+exports.create = (req,res) =>
+  cats.create(req.body.name.trim()).then(r=>res.json(r));
 
-exports.update = (req, res) => {
-  const { name } = req.body;
-  if (!name || name.trim() === '') {
-    return res.status(400).json({ message: 'Category name is required' });
-  }
-  Category.update(req.params.id, name.trim(), (err) => {
-    if (err) return res.status(500).json({ message: 'Server error' });
-    res.json({ message: 'Category updated' });
-  });
-};
+exports.update = (req,res) =>
+  cats.update(parseInt(req.params.id), req.body.name.trim())
+      .then(()=>res.json({ message:'Updated' }));
 
-exports.delete = (req, res) => {
-  Category.delete(req.params.id, (err) => {
-    if (err) return res.status(500).json({ message: 'Server error' });
-    res.json({ message: 'Category deleted' });
-  });
-};
+exports.delete = (req,res) =>
+  cats.delete(parseInt(req.params.id)).then(()=>res.json({ message:'Deleted' }));
